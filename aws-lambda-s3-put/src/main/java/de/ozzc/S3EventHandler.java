@@ -22,6 +22,7 @@ public class S3EventHandler implements RequestHandler<S3Event, String> {
     @Override
     public String handleRequest(S3Event input, Context context) {
         LambdaLogger logger = context.getLogger();
+        AmazonS3 s3Client = new AmazonS3Client();
 
         if (input != null) {
             if (input.getRecords() != null) {
@@ -32,7 +33,6 @@ public class S3EventHandler implements RequestHandler<S3Event, String> {
                         String srcKey = record.getS3().getObject().getKey().replace('+', ' ');
                         srcKey = URLDecoder.decode(srcKey, "UTF-8");
 
-                        AmazonS3 s3Client = new AmazonS3Client();
                         s3Client.setRegion(Region.getRegion(Regions.fromName(record.getAwsRegion())));
                         S3Object s3Object = s3Client.getObject(new GetObjectRequest(srcBucket, srcKey));
                         try (InputStream objectData = s3Object.getObjectContent()) {
