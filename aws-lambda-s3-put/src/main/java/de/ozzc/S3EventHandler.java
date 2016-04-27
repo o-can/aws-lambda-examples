@@ -36,20 +36,21 @@ public class S3EventHandler implements RequestHandler<S3Event, String> {
                         s3Client.setRegion(Region.getRegion(Regions.fromName(record.getAwsRegion())));
                         S3Object s3Object = s3Client.getObject(new GetObjectRequest(srcBucket, srcKey));
                         try (InputStream objectData = s3Object.getObjectContent()) {
-                            PDDocument document = PDDocument.load(objectData);
-                            PDDocumentInformation metadata = document.getDocumentInformation();
-                            String title = metadata.getTitle();
-                            if (title == null) {
-                                title = "UNKNOWN TITLE";
+                            try(PDDocument document = PDDocument.load(objectData)) {
+                                PDDocumentInformation metadata = document.getDocumentInformation();
+                                String title = metadata.getTitle();
+                                if (title == null) {
+                                    title = "UNKNOWN TITLE";
+                                }
+                                String author = metadata.getAuthor();
+                                if (author == null) {
+                                    author = "UNKNOWN AUTHOR";
+                                }
+                                String numberOfPages = String.valueOf(document.getNumberOfPages());
+                                logger.log("Title : " + title);
+                                logger.log("Author : " + author);
+                                logger.log("Number of Pages : " + numberOfPages);
                             }
-                            String author = metadata.getAuthor();
-                            if (author == null) {
-                                author = "UNKNOWN AUTHOR";
-                            }
-                            String numberOfPages = String.valueOf(document.getNumberOfPages());
-                            logger.log("Title : " + title);
-                            logger.log("Author : " + author);
-                            logger.log("Number of Pages : " + numberOfPages);
                         }
                     }
                     return "success";
