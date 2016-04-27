@@ -16,6 +16,7 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.util.Calendar;
 
 public class S3EventHandler implements RequestHandler<S3Event, String> {
 
@@ -46,10 +47,13 @@ public class S3EventHandler implements RequestHandler<S3Event, String> {
                                 if (author == null) {
                                     author = "UNKNOWN AUTHOR";
                                 }
+                                Calendar creationDate = metadata.getCreationDate();
+
                                 String numberOfPages = String.valueOf(document.getNumberOfPages());
                                 logger.log("Title : " + title);
                                 logger.log("Author : " + author);
                                 logger.log("Number of Pages : " + numberOfPages);
+                                logger.log("Creation Date : "+creationDate);
                             }
                         }
                     }
