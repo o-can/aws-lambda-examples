@@ -11,6 +11,12 @@
 
     <artifactId>aws-lambda-s3-put</artifactId>
 
+    <properties>
+        <pdfbox.version>2.0.0</pdfbox.version>
+        <jackson-databind.version>2.7.3</jackson-databind.version>
+        <skipTests>true</skipTests>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
@@ -24,9 +30,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <properties>
-        <pdfbox.version>2.0.0</pdfbox.version>
-        <jackson-databind.version>2.7.3</jackson-databind.version>
-    </properties>
 
 </project>
