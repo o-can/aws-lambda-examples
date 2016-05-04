@@ -12,10 +12,11 @@
     <modules>
         <module>aws-lambda-hello-world</module>
         <module>aws-lambda-s3-put</module>
+        <module>slack-echo-command</module>
     </modules>
 
     <properties>
-        <aws-java-sdk-bom.version>1.10.73</aws-java-sdk-bom.version>
+        <aws-java-sdk-bom.version>1.10.75</aws-java-sdk-bom.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
