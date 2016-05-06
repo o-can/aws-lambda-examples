@@ -1,4 +1,4 @@
-package de.ozzc;
+package de.ozzc.aws;
 
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -7,13 +7,11 @@ import com.amazonaws.services.kms.model.DecryptRequest;
 import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import de.ozzc.slack.SlackRequest;
+import de.ozzc.slack.SlackSlashCommand;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Java Implementation of the Slack-Echo-Command Blueprint for AWS Lambda.
@@ -25,7 +23,7 @@ public class SlackEchoCommandHandler implements RequestHandler<SlackRequest, Str
 
     private String token;
     private Region region;
-    private String kmsEncryptedToken = "<kmsEncryptedToken>";
+    protected String kmsEncryptedToken = "<kmsEncryptedToken>";
 
     public void setKmsEncryptedToken(String kmsEncryptedToken) {
         this.kmsEncryptedToken = kmsEncryptedToken;
@@ -62,46 +60,20 @@ public class SlackEchoCommandHandler implements RequestHandler<SlackRequest, Str
     }
 
     private String processEvent(SlackRequest slackRequest, Context context) {
-        String body = slackRequest.getBody();
-        Map<String, String> params = parseUrlEncodedData(body, "UTF-8");
-        String requestToken = params.get("token");
-        if (requestToken == null) {
+        SlackSlashCommand slackSlashCommand = new SlackSlashCommand().withUrlEncodedString(slackRequest.getBody());
+        if (slackSlashCommand.getToken() == null) {
             context.getLogger().log("ERROR: Request token was not provided");
             throw new IllegalArgumentException("Invalid request token");
         }
-        if (!token.equals(requestToken)) {
-            context.getLogger().log("ERROR: Request token (" + requestToken + ") does not match expected");
+        if (!token.equals(slackSlashCommand.getToken())) {
+            context.getLogger().log("ERROR: Request token (" + slackSlashCommand.getToken() + ") does not match expected");
             throw new IllegalArgumentException("Invalid request token");
         }
-        String user = params.get("user_name");
-        String command = params.get("command");
-        String channel = params.get("channel_name");
-        String commandText = params.get("text");
-        context.getLogger().log(user + " invoked " + command + " in " + channel + " with the following text : " + commandText);
+        context.getLogger().log(
+                slackSlashCommand.getUserName()
+                        + " invoked " + slackSlashCommand.getCommand()
+                        + " in " + slackSlashCommand.getChannelName()
+                        + " with the following response_url : " + slackSlashCommand.getResponseURL());
         return "SUCCESS";
-    }
-
-    private Map<String, String> parseUrlEncodedData(String data, String charset) {
-        if (data != null && !data.isEmpty()) {
-            String charsetStr = (charset != null) ? charset : "UTF-8";
-            String[] ampersandTokens = data.split("&");
-            Map<String, String> kvMap = new HashMap<>(ampersandTokens.length);
-            for (String kvTokens : ampersandTokens) {
-                String[] kvPair = kvTokens.split("=");
-                if (kvPair.length == 2) {
-                    if (!kvPair[0].isEmpty()) {
-                        try {
-                            String key = URLDecoder.decode(kvPair[0], charsetStr);
-                            String value = URLDecoder.decode(kvPair[1], charsetStr);
-                            kvMap.put(key, value);
-                        } catch (UnsupportedEncodingException e) {
-                            throw new IllegalArgumentException(e);
-                        }
-                    }
-                }
-            }
-            return kvMap;
-        }
-        return new HashMap<>(0);
     }
 }

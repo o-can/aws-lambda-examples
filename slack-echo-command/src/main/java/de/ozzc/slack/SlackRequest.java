@@ -1,4 +1,4 @@
-package de.ozzc;
+package de.ozzc.slack;
 
 /**
  * @author Ozkan Can

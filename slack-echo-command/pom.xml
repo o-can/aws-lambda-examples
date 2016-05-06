@@ -11,10 +11,6 @@
 
     <artifactId>slack-echo-command</artifactId>
 
-    <properties>
-        <skipTests>true</skipTests>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.amazonaws</groupId>
